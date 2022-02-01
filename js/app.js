@@ -9,15 +9,12 @@ let marcas = [];
 let tipos = [];
 
 async function init() {
-  // let products = await loadProducts();
-  await getMarcasETipos();
+  await loadAndShowProducts();
+  getMarcasETipos();
   populateMarcas();
   populateTipos();
   let delayedLoad = delay(loadAndShowProducts, 500);
-  nomeEl.addEventListener('input', delayedLoad);
-  marcaEl.addEventListener('input', delayedLoad);
-  tipoEl.addEventListener('input', delayedLoad);
-  sortEl.addEventListener('input', delayedLoad);
+  watchInputChanges(delayedLoad, nomeEl, marcaEl, tipoEl, sortEl);
 }
 
 init();
@@ -25,11 +22,7 @@ init();
 async function loadAndShowProducts() {
   let products = await loadProducts();
   allProducts = products;
-  // if (products.length > 12) {
-  //   products = products.slice(0, 12);
-  // }
-  console.log({products});
-  showProducts(products);
+  showProducts(allProducts)
   return products;
 }
 
@@ -63,9 +56,8 @@ function loadProducts() {
     });
 }
 
-async function getMarcasETipos() {
+function getMarcasETipos() {
   //not a good practice
-  await loadAndShowProducts();
 
   let m = new Set();
   let t = new Set();
@@ -95,6 +87,12 @@ function populateTipos() {
     opt.value = tipo;
     opt.innerText = tipo;
     tipoEl.appendChild(opt)
+  }
+}
+
+function watchInputChanges(fn, ...elements) {
+  for (let el of elements) {
+    el.addEventListener('input', fn);
   }
 }
 
