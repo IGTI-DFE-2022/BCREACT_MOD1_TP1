@@ -75,8 +75,8 @@ async function getMarcasETipos() {
     t.add(p.product_type);
   }
 
-  marcas = Array.from(m);
-  tipos = Array.from(t);
+  marcas = Array.from(m).sort();
+  tipos = Array.from(t).sort();
 
 }
 
