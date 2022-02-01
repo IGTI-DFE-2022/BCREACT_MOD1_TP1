@@ -27,12 +27,7 @@ async function loadAndShowProducts() {
 }
 
 function loadProducts() {
-  let [nome, marca, tipo] = getFilters();
-  let q = getQueryString(nome, marca, tipo);
-  if (!q) {
-    q = '?';
-  }
-  let url = baseUrl + "/products" + q + '&' + getSortString();
+  let url = buildFetchUrl();
   console.log({url});
   return fetch(url)
     .then((data) => data.json())
@@ -42,6 +37,15 @@ function loadProducts() {
       }
       return products;
     });
+}
+
+function buildFetchUrl() {
+  let [nome, marca, tipo] = getFilters();
+  let q = getQueryString(nome, marca, tipo);
+  if (!q) {
+    q = '?';
+  }
+  return baseUrl + "/products" + q + '&' + getSortString();
 }
 
 function compareProductsForSort(a, b) {
@@ -59,8 +63,6 @@ function compareProductsForSort(a, b) {
 }
 
 function getMarcasETipos() {
-  //not a good practice
-
   let m = new Set();
   let t = new Set();
 
@@ -71,7 +73,6 @@ function getMarcasETipos() {
 
   marcas = Array.from(m).sort();
   tipos = Array.from(t).sort();
-
 }
 
 function populateMarcas() {
