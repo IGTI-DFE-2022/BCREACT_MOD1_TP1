@@ -25,9 +25,9 @@ init();
 async function loadAndShowProducts() {
   let products = await loadProducts();
   allProducts = products;
-  if (products.length > 12) {
-    products = products.slice(0, 12);
-  }
+  // if (products.length > 12) {
+  //   products = products.slice(0, 12);
+  // }
   console.log({products});
   showProducts(products);
   return products;
@@ -66,7 +66,7 @@ function loadProducts() {
 async function getMarcasETipos() {
   //not a good practice
   await loadAndShowProducts();
-  
+
   let m = new Set();
   let t = new Set();
 
@@ -164,6 +164,7 @@ function productItem(product) {
       <div class="product-brands"><span class="product-brand background-brand">${product.brand}</span>
   <span class="product-brand background-price">R$ ${(+product.price * 5.5).toFixed(2)}</span></div>
     </section>
+    ${loadDetails(product)}
   </div>`;
   return stringToElement('div', item)
 }
@@ -173,27 +174,29 @@ function loadDetails(product) {
   let details = `<section class="product-details"><div class="details-row">
         <div>Brand</div>
         <div class="details-bar">
-          <div class="details-bar-bg" style="width= 250">nyx</div>
+          <div class="details-bar-bg" style="width= 250">${product.brand}</div>
         </div>
       </div><div class="details-row">
         <div>Price</div>
         <div class="details-bar">
-          <div class="details-bar-bg" style="width= 250">10.49</div>
+          <div class="details-bar-bg" style="width= 250">${(+product.price * 5.5).toFixed(2)}</div>
         </div>
       </div><div class="details-row">
         <div>Rating</div>
         <div class="details-bar">
-          <div class="details-bar-bg" style="width= 250">5</div>
+          <div class="details-bar-bg" style="width= 250">${product.rating}</div>
         </div>
       </div><div class="details-row">
         <div>Category</div>
         <div class="details-bar">
-          <div class="details-bar-bg" style="width= 250"></div>
+          <div class="details-bar-bg" style="width= 250">${product.category}</div>
         </div>
       </div><div class="details-row">
         <div>Product_type</div>
         <div class="details-bar">
-          <div class="details-bar-bg" style="width= 250">bronzer</div>
+          <div class="details-bar-bg" style="width= 250">${product.product_type}</div>
         </div>
       </div></section>`;
+  return details
+  // return stringToElement('section', details);
 }
