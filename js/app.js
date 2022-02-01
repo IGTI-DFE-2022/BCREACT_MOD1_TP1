@@ -3,6 +3,8 @@ const productList = document.querySelector('.catalog');
 const nomeEl = document.querySelector('#filter-name');
 const marcaEl = document.querySelector('#filter-brand');
 const tipoEl = document.querySelector('#filter-type');
+const sortEl = document.querySelector('#sort-type');
+let allProducts = [];
 let marcas = [];
 let tipos = [];
 
@@ -15,14 +17,16 @@ async function init() {
   nomeEl.addEventListener('input', delayedLoad);
   marcaEl.addEventListener('input', delayedLoad);
   tipoEl.addEventListener('input', delayedLoad);
+  sortEl.addEventListener('input', delayedLoad);
 }
 
 init();
 
 async function loadAndShowProducts() {
   let products = await loadProducts();
-  if (products.length > 10) {
-    products = products.slice(0, 10);
+  allProducts = products;
+  if (products.length > 12) {
+    products = products.slice(0, 12);
   }
   console.log({products});
   showProducts(products);
@@ -31,14 +35,38 @@ async function loadAndShowProducts() {
 
 function loadProducts() {
   let [nome, marca, tipo] = getFilters();
-  let url = baseUrl + "/products" + getQueryString(nome, marca, tipo);
+  let q = getQueryString(nome, marca, tipo);
+  if (!q) {
+    q = '?';
+  }
+  let url = baseUrl + "/products" + q + '&' + getSortString();
   console.log({url});
-  return fetch(url).then((data) => data.json());
+  return fetch(url)
+    .then((data) => data.json())
+    .then(products => {
+      if (sortEl.value) {
+        return products.sort((a, b) => {
+          let sortAttr = sortEl.value.split("_")[0]
+          let sortOrder = sortEl.value.split("_")[1] === "+" ? 'desc' : 'asc';
+          let aVal = a[sortAttr] ?? 0;
+          let bVal = b[sortAttr] ?? 0;
+          let val = 0;
+          if (sortAttr === 'name') {
+            val = ('' + aVal.attr).localeCompare(bVal.attr);
+          } else {
+            val = aVal - bVal;
+          }
+          return sortOrder === 'desc' ? val * -1 : val;
+        })
+      }
+      return products;
+    });
 }
 
 async function getMarcasETipos() {
   //not a good practice
-  let allProducts = await loadAndShowProducts();
+  await loadAndShowProducts();
+  
   let m = new Set();
   let t = new Set();
 
@@ -84,6 +112,15 @@ function getQueryString(nome, marca, tipo) {
   return q.length > 0 ? '?' + q.join('&') : '';
 }
 
+function getSortString() {
+  if (!sortEl.value) {
+    return '';
+  }
+  let sortAttr = sortEl.value.split("_")[0]
+  let sortOrder = sortEl.value.split("_")[1] === "+" ? 'desc' : 'asc';
+  return `_sort=${sortAttr}&_order=${sortOrder}`
+}
+
 function getFilters() {
   let nome = nomeEl.value;
   let marca = marcaEl.value;
@@ -125,7 +162,7 @@ function productItem(product) {
     <section class="product-description">
       <h1 class="product-name">${product.name}</h1>
       <div class="product-brands"><span class="product-brand background-brand">${product.brand}</span>
-  <span class="product-brand background-price">R$ ${(+product.price).toFixed(2)}</span></div>
+  <span class="product-brand background-price">R$ ${(+product.price * 5.5).toFixed(2)}</span></div>
     </section>
   </div>`;
   return stringToElement('div', item)
