@@ -38,22 +38,24 @@ function loadProducts() {
     .then((data) => data.json())
     .then(products => {
       if (sortEl.value) {
-        return products.sort((a, b) => {
-          let sortAttr = sortEl.value.split("_")[0]
-          let sortOrder = sortEl.value.split("_")[1] === "+" ? 'desc' : 'asc';
-          let aVal = a[sortAttr] ?? 0;
-          let bVal = b[sortAttr] ?? 0;
-          let val = 0;
-          if (sortAttr === 'name') {
-            val = ('' + aVal.attr).localeCompare(bVal.attr);
-          } else {
-            val = aVal - bVal;
-          }
-          return sortOrder === 'desc' ? val * -1 : val;
-        })
+        return products.sort(compareProductsForSort)
       }
       return products;
     });
+}
+
+function compareProductsForSort(a, b) {
+  let sortAttr = sortEl.value.split("_")[0]
+  let sortOrder = sortEl.value.split("_")[1] === "+" ? 'desc' : 'asc';
+  let aVal = a[sortAttr] ?? 0;
+  let bVal = b[sortAttr] ?? 0;
+  let val = 0;
+  if (sortAttr === 'name') {
+    val = ('' + aVal.attr).localeCompare(bVal.attr);
+  } else {
+    val = aVal - bVal;
+  }
+  return sortOrder === 'desc' ? val * -1 : val;
 }
 
 function getMarcasETipos() {
